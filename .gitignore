@@ -1,0 +1,4 @@
+bin/
+Dependencies/
+.vs/
+*.user
