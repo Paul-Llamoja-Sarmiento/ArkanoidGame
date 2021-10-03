@@ -1,11 +1,11 @@
 #include "Application.h"
 
-bool Application::initialize_window()
+void Application::initialize_window()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
 		std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
-		return false;
+		isGameRunning = false;
 	}
 	
 	m_pWindow = SDL_CreateWindow("Arkanoid Game - Paul Llamoja S." ,
@@ -15,15 +15,32 @@ bool Application::initialize_window()
 	if (m_pWindow == nullptr)
 	{
 		std::cerr << "Window could not be created! SDL_Error " << SDL_GetError() << std::endl;
-		return false;
+		isGameRunning = false;
 	}
 
 	m_pRenderer = SDL_CreateRenderer(m_pWindow , -1 , 0);
 	if (m_pRenderer == nullptr)
 	{
 		std::cerr << "Renderer could not be created! SDL_Error " << SDL_GetError() << std::endl;
-		return false;
+		isGameRunning = false;
 	}
 
-	return true;	
+	isGameRunning = true;	
+}
+
+void Application::process_input()
+{
+	SDL_Event event;
+	SDL_PollEvent(&event);	
+
+	switch (event.type)
+	{
+		case SDL_QUIT:
+			isGameRunning = false;
+			break;
+		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_ESCAPE)
+				isGameRunning = false;
+			break;
+	}
 }

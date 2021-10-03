@@ -5,10 +5,12 @@
 int main(int argc , char *args[])
 {
 	Application app(WINDOW_HEIGHT , WINDOW_WIDTH);
+	app.initialize_window();
 
-	bool init = app.initialize_window();
-
-	SDL_Delay(2000);
+	while (app.isGameRunning)
+	{
+		app.process_input();
+	}
 
 	return 0;
 }
