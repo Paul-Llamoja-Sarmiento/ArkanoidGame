@@ -2,15 +2,17 @@
 
 #include <SDL.h>
 #include <iostream>
+#include "Constants.h"
 #include "Entity.h"
 
 
 class Application
 {
 public:
-	Application(const int windowHeight , const int windowWidth)
+	Application()
 		: m_pWindow {nullptr} , m_pRenderer {nullptr} , m_isGameRunning {false} ,
-		  m_windowHeight {windowHeight} , m_windowWidth {windowWidth} { }
+		  m_windowHeight {WINDOW_HEIGHT} , m_windowWidth {WINDOW_WIDTH} ,
+		  m_frameTargetTime {FRAME_TARGET_TIME} , m_lastFrameTime {0} { }
 	~Application()
 	{
 		SDL_DestroyRenderer(m_pRenderer);
@@ -24,7 +26,7 @@ public:
 	// Game-loop methods
 	void set_up();
 	void process_input();
-	void update_data() { }
+	void update_data();
 	void render();
 
 private:
@@ -37,6 +39,10 @@ private:
 	SDL_Window *m_pWindow;
 	SDL_Renderer *m_pRenderer;
 
+	// Update time parameters
+	int m_frameTargetTime;	// Time in miliseconds between frames that we want to achieve
+	int m_lastFrameTime;	// Time in miliseconds from the last frame
+
 	// Entities
-	Ball m_ball;
+	Entity m_ball;
 };

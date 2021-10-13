@@ -32,7 +32,9 @@ void Application::initialize_window()
 void Application::set_up()
 {
 	initialize_window();
-	m_ball.set_ball(20 , 20 , 15 , 15);
+	m_ball.set_entity(20 , 20 ,
+					  70 , 50 ,
+					  15 , 15);
 }
 
 
@@ -53,19 +55,37 @@ void Application::process_input()
 	}
 }
 
+
+void Application::update_data()
+{
+	// Delay the update function to match with the Frame Target Time
+	int timeToWait = m_frameTargetTime - (SDL_GetTicks() - m_lastFrameTime);
+	if (timeToWait > 0 && timeToWait <= m_frameTargetTime)
+		SDL_Delay(timeToWait);
+
+	// Get a delta time factor converted to seconds to be used to update my objects
+	float deltaTime = (SDL_GetTicks() - m_lastFrameTime) / 1000.0f;
+
+	m_lastFrameTime = SDL_GetTicks();
+
+	m_ball.m_x += m_ball.m_velX * deltaTime;
+	m_ball.m_y += m_ball.m_velY * deltaTime;
+}
+
 void Application::render()
 {
+	// Set the background
 	SDL_SetRenderDrawColor(m_pRenderer , 0 , 0 , 0 , 255);
 	SDL_RenderClear(m_pRenderer);
 
-	// Draw a rectangle
-	SDL_Rect ballRectangle = {m_ball.m_x ,
-							  m_ball.m_y ,
-							  m_ball.m_width ,
-							  m_ball.m_height};
-
+	// Draw a "ball"
+	SDL_Rect ballRectangle = {static_cast<int>(m_ball.m_x) ,
+							  static_cast<int>(m_ball.m_y) ,
+							  static_cast<int>(m_ball.m_width) ,
+							  static_cast<int>(m_ball.m_height)};
 	SDL_SetRenderDrawColor(m_pRenderer , 255 , 255 , 255 , 255);
 	SDL_RenderFillRect(m_pRenderer , &ballRectangle);
 
+	// Buffer swap
 	SDL_RenderPresent(m_pRenderer);	
 }
