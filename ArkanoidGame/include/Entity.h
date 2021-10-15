@@ -8,9 +8,7 @@ public:
 		  m_velX {} , m_velY {} ,
 		  m_width {} , m_height {} { }
 	
-	inline void set_entity(float x , float y ,
-						   float velX , float velY ,
-						   float width , float height)
+	inline void set_entity(float x , float y , float velX , float velY , float width , float height)
 	{
 		m_x = x;
 		m_y = y;

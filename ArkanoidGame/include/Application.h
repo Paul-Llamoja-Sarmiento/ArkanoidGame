@@ -45,4 +45,5 @@ private:
 
 	// Entities
 	Entity m_ball;
+	Entity m_paddle;
 };

@@ -32,9 +32,10 @@ void Application::initialize_window()
 void Application::set_up()
 {
 	initialize_window();
-	m_ball.set_entity(20 , 20 ,
-					  70 , 50 ,
-					  15 , 15);
+	m_ball.set_entity(20 , 20 , 70 , 50 , 15 , 15);
+	m_paddle.set_entity(0 , 0 , 0 , 0 , 150 , 20);
+	m_paddle.m_x = (m_windowWidth / 2.0f) - (m_paddle.m_width / 2.0f);
+	m_paddle.m_y = m_windowHeight - 40.0f;
 }
 
 
@@ -78,13 +79,21 @@ void Application::render()
 	SDL_SetRenderDrawColor(m_pRenderer , 0 , 0 , 0 , 255);
 	SDL_RenderClear(m_pRenderer);
 
+	SDL_SetRenderDrawColor(m_pRenderer , 255 , 255 , 255 , 255);
+
 	// Draw a "ball"
 	SDL_Rect ballRectangle = {static_cast<int>(m_ball.m_x) ,
 							  static_cast<int>(m_ball.m_y) ,
 							  static_cast<int>(m_ball.m_width) ,
 							  static_cast<int>(m_ball.m_height)};
-	SDL_SetRenderDrawColor(m_pRenderer , 255 , 255 , 255 , 255);
 	SDL_RenderFillRect(m_pRenderer , &ballRectangle);
+
+	// Draw the paddle
+	SDL_Rect paddleRectangle = {static_cast<int>(m_paddle.m_x) ,
+							    static_cast<int>(m_paddle.m_y) ,
+								static_cast<int>(m_paddle.m_width) ,
+								static_cast<int>(m_paddle.m_height)};
+	SDL_RenderFillRect(m_pRenderer , &paddleRectangle);
 
 	// Buffer swap
 	SDL_RenderPresent(m_pRenderer);	
