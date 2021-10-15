@@ -52,7 +52,16 @@ void Application::process_input()
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE)
 				m_isGameRunning = false;
+			if (event.key.keysym.sym == SDLK_LEFT)
+				m_paddle.m_velX = -150;
+			if (event.key.keysym.sym == SDLK_RIGHT)
+				m_paddle.m_velX = 150;
 			break;
+		case SDL_KEYUP:
+			if (event.key.keysym.sym == SDLK_LEFT)
+				m_paddle.m_velX = 0;
+			if (event.key.keysym.sym == SDLK_RIGHT)
+				m_paddle.m_velX = 0;
 	}
 }
 
@@ -69,8 +78,15 @@ void Application::update_data()
 
 	m_lastFrameTime = SDL_GetTicks();
 
+	// Moving the ball
 	m_ball.m_x += m_ball.m_velX * deltaTime;
 	m_ball.m_y += m_ball.m_velY * deltaTime;
+
+	// Moving the paddle
+	float paddleLastX = m_paddle.m_x;
+	m_paddle.m_x += m_paddle.m_velX * deltaTime;
+	if (m_paddle.m_x < 0 || m_paddle.m_x > (m_windowWidth - m_paddle.m_width))
+		m_paddle.m_x = paddleLastX;
 }
 
 void Application::render()
