@@ -1,4 +1,9 @@
-bin/
-Dependencies/
+/bin/intermediates/
+/bin/Win32/Debug/*
+!/bin/Win32/Debug/SDL2.dll
+
+/bin/x64/Debug/*
+!/bin/x64/Debug/SDL2.dll
+
 .vs/
 *.user
