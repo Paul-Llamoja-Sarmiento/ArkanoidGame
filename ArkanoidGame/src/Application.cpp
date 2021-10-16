@@ -32,10 +32,9 @@ void Application::initialize_window()
 void Application::set_up()
 {
 	initialize_window();
-	m_ball.set_entity(20 , 20 , 70 , 50 , 15 , 15);
-	m_paddle.set_entity(0 , 0 , 0 , 0 , 150 , 20);
+	m_ball.set_entity(20 , 20 , 150 , 200 , 15 , 15);
+	m_paddle.set_entity(0 , (m_windowHeight - 40.0f) , 0 , 0 , 150 , 20);
 	m_paddle.m_x = (m_windowWidth / 2.0f) - (m_paddle.m_width / 2.0f);
-	m_paddle.m_y = m_windowHeight - 40.0f;
 }
 
 
@@ -78,11 +77,25 @@ void Application::update_data()
 
 	m_lastFrameTime = SDL_GetTicks();
 
-	// Moving the ball
-	m_ball.m_x += m_ball.m_velX * deltaTime;
-	m_ball.m_y += m_ball.m_velY * deltaTime;
+	// Move the ball
+	float ballLastX = m_ball.m_x;
+	float ballLastY = m_ball.m_y;
 
-	// Moving the paddle
+	m_ball.m_x += m_ball.m_velX * deltaTime;
+	if (m_ball.m_x < 0 || m_ball.m_x > (m_windowWidth - m_ball.m_width))
+	{
+		m_ball.m_x = ballLastX;
+		m_ball.m_velX *= -1;
+	}
+		
+	m_ball.m_y += m_ball.m_velY * deltaTime;
+	if (m_ball.m_y < 0 || m_ball.m_y > (m_windowHeight - m_ball.m_height))
+	{
+		m_ball.m_y = ballLastY;
+		m_ball.m_velY *= -1;
+	}
+
+	// Move the paddle
 	float paddleLastX = m_paddle.m_x;
 	m_paddle.m_x += m_paddle.m_velX * deltaTime;
 	if (m_paddle.m_x < 0 || m_paddle.m_x > (m_windowWidth - m_paddle.m_width))
@@ -106,7 +119,7 @@ void Application::render()
 
 	// Draw the paddle
 	SDL_Rect paddleRectangle = {static_cast<int>(m_paddle.m_x) ,
-							    static_cast<int>(m_paddle.m_y) ,
+								static_cast<int>(m_paddle.m_y) ,
 								static_cast<int>(m_paddle.m_width) ,
 								static_cast<int>(m_paddle.m_height)};
 	SDL_RenderFillRect(m_pRenderer , &paddleRectangle);
