@@ -12,7 +12,7 @@ public:
 	Application()
 		: m_pWindow {nullptr} , m_pRenderer {nullptr} , m_isGameRunning {false} ,
 		  m_windowHeight {WINDOW_HEIGHT} , m_windowWidth {WINDOW_WIDTH} ,
-		  m_frameTargetTime {FRAME_TARGET_TIME} , m_lastFrameTime {0} { }
+		  m_frameTargetTime {FRAME_TARGET_TIME} , m_lastFrameTime {0} , m_isGamePaused {false} { }
 	~Application()
 	{
 		SDL_DestroyRenderer(m_pRenderer);
@@ -21,7 +21,7 @@ public:
 	}
 
 	inline bool get_is_game_running() { return m_isGameRunning; }
-	void initialize_window();
+	bool initialize_window();
 
 	// Game-loop methods
 	void set_up();
@@ -36,6 +36,7 @@ private:
 
 	// Game parameters
 	bool m_isGameRunning;
+	bool m_isGamePaused;
 	SDL_Window *m_pWindow;
 	SDL_Renderer *m_pRenderer;
 

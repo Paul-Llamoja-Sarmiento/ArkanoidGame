@@ -4,25 +4,23 @@ class Entity
 {
 public:
 	Entity()
-		: m_x {} , m_y {} ,
-		  m_velX {} , m_velY {} ,
-		  m_width {} , m_height {} { }
+		: x {} , y {} , velX {} , velY {} , width {} , height {} { }
 	
-	inline void set_entity(float x , float y , float velX , float velY , float width , float height)
+	inline void set_entity(float xVal , float yVal , float velXVal , float velYVal , float widthVal , float heightVal)
 	{
-		m_x = x;
-		m_y = y;
-		m_velX = velX;
-		m_velY = velY;
-		m_width = width;
-		m_height = height;
+		x = xVal;
+		y = yVal;
+		velX = velXVal;
+		velY = velYVal;
+		width = widthVal;
+		height = heightVal;
 	}
 
 	// Member variables
-	float m_x;
-	float m_y;
-	float m_velX;
-	float m_velY;
-	float m_width;
-	float m_height;
+	float x;
+	float y;
+	float velX;
+	float velY;
+	float width;
+	float height;
 };

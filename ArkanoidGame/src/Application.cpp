@@ -1,11 +1,11 @@
 #include "Application.h"
 
-void Application::initialize_window()
+bool Application::initialize_window()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
 		std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
-		m_isGameRunning = false;
+		return false;
 	}
 	
 	m_pWindow = SDL_CreateWindow("Arkanoid Game - Paul Llamoja S." ,
@@ -15,26 +15,26 @@ void Application::initialize_window()
 	if (m_pWindow == nullptr)
 	{
 		std::cerr << "Window could not be created! SDL_Error " << SDL_GetError() << std::endl;
-		m_isGameRunning = false;
+		return false;
 	}
 
 	m_pRenderer = SDL_CreateRenderer(m_pWindow , -1 , 0);
 	if (m_pRenderer == nullptr)
 	{
 		std::cerr << "Renderer could not be created! SDL_Error " << SDL_GetError() << std::endl;
-		m_isGameRunning = false;
+		return false;
 	}
 
-	m_isGameRunning = true;	
+	return true;	
 }
 
 
 void Application::set_up()
 {
-	initialize_window();
+	m_isGameRunning = initialize_window();
 	m_ball.set_entity(20 , 20 , 150 , 200 , 15 , 15);
 	m_paddle.set_entity(0 , (m_windowHeight - 40.0f) , 0 , 0 , 150 , 20);
-	m_paddle.m_x = (m_windowWidth / 2.0f) - (m_paddle.m_width / 2.0f);
+	m_paddle.x = (m_windowWidth / 2.0f) - (m_paddle.width / 2.0f);
 }
 
 
@@ -51,16 +51,21 @@ void Application::process_input()
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE)
 				m_isGameRunning = false;
+			if (event.key.keysym.sym == SDLK_SPACE)
+			{
+				if (m_isGamePaused)
+					m_isGamePaused = false;
+				else
+					m_isGamePaused = true;
+			}
 			if (event.key.keysym.sym == SDLK_LEFT)
-				m_paddle.m_velX = -150;
+				m_paddle.velX = -150;
 			if (event.key.keysym.sym == SDLK_RIGHT)
-				m_paddle.m_velX = 150;
+				m_paddle.velX = 150;
 			break;
 		case SDL_KEYUP:
-			if (event.key.keysym.sym == SDLK_LEFT)
-				m_paddle.m_velX = 0;
-			if (event.key.keysym.sym == SDLK_RIGHT)
-				m_paddle.m_velX = 0;
+			if ((event.key.keysym.sym == SDLK_LEFT) || (event.key.keysym.sym == SDLK_RIGHT))
+				m_paddle.velX = 0;
 	}
 }
 
@@ -77,29 +82,32 @@ void Application::update_data()
 
 	m_lastFrameTime = SDL_GetTicks();
 
-	// Move the ball
-	float ballLastX = m_ball.m_x;
-	float ballLastY = m_ball.m_y;
-
-	m_ball.m_x += m_ball.m_velX * deltaTime;
-	if (m_ball.m_x < 0 || m_ball.m_x > (m_windowWidth - m_ball.m_width))
+	if (m_isGamePaused == false)
 	{
-		m_ball.m_x = ballLastX;
-		m_ball.m_velX *= -1;
-	}
-		
-	m_ball.m_y += m_ball.m_velY * deltaTime;
-	if (m_ball.m_y < 0 || m_ball.m_y > (m_windowHeight - m_ball.m_height))
-	{
-		m_ball.m_y = ballLastY;
-		m_ball.m_velY *= -1;
-	}
+		// Move the ball
+		float ballLastX = m_ball.x;
+		float ballLastY = m_ball.y;
 
-	// Move the paddle
-	float paddleLastX = m_paddle.m_x;
-	m_paddle.m_x += m_paddle.m_velX * deltaTime;
-	if (m_paddle.m_x < 0 || m_paddle.m_x > (m_windowWidth - m_paddle.m_width))
-		m_paddle.m_x = paddleLastX;
+		m_ball.x += m_ball.velX * deltaTime;
+		if (m_ball.x < 0 || m_ball.x >(m_windowWidth - m_ball.width))
+		{
+			m_ball.x = ballLastX;
+			m_ball.velX *= -1;
+		}
+
+		m_ball.y += m_ball.velY * deltaTime;
+		if (m_ball.y < 0 || m_ball.y >(m_windowHeight - m_ball.height))
+		{
+			m_ball.y = ballLastY;
+			m_ball.velY *= -1;
+		}
+
+		// Move the paddle
+		float paddleLastX = m_paddle.x;
+		m_paddle.x += m_paddle.velX * deltaTime;
+		if (m_paddle.x < 0 || m_paddle.x >(m_windowWidth - m_paddle.width))
+			m_paddle.x = paddleLastX;
+	}
 }
 
 void Application::render()
@@ -111,17 +119,17 @@ void Application::render()
 	SDL_SetRenderDrawColor(m_pRenderer , 255 , 255 , 255 , 255);
 
 	// Draw a "ball"
-	SDL_Rect ballRectangle = {static_cast<int>(m_ball.m_x) ,
-							  static_cast<int>(m_ball.m_y) ,
-							  static_cast<int>(m_ball.m_width) ,
-							  static_cast<int>(m_ball.m_height)};
+	SDL_Rect ballRectangle = {static_cast<int>(m_ball.x) ,
+							  static_cast<int>(m_ball.y) ,
+							  static_cast<int>(m_ball.width) ,
+							  static_cast<int>(m_ball.height)};
 	SDL_RenderFillRect(m_pRenderer , &ballRectangle);
 
 	// Draw the paddle
-	SDL_Rect paddleRectangle = {static_cast<int>(m_paddle.m_x) ,
-								static_cast<int>(m_paddle.m_y) ,
-								static_cast<int>(m_paddle.m_width) ,
-								static_cast<int>(m_paddle.m_height)};
+	SDL_Rect paddleRectangle = {static_cast<int>(m_paddle.x) ,
+								static_cast<int>(m_paddle.y) ,
+								static_cast<int>(m_paddle.width) ,
+								static_cast<int>(m_paddle.height)};
 	SDL_RenderFillRect(m_pRenderer , &paddleRectangle);
 
 	// Buffer swap
