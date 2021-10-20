@@ -29,10 +29,24 @@ bool Application::initialize_window()
 }
 
 
+bool Application::collision(Entity &paddle , Entity &ball)
+{
+	// Top surface collision
+	if ((ball.y + ball.height > paddle.y) && (ball.x > paddle.x) && (ball.x + ball.width < paddle.x + paddle.width))
+	{
+		ball.velY *= -1;
+		return true;
+	}
+	else
+		return false;		
+}
+
+
 void Application::set_up()
 {
+	m_isGamePaused = false;
 	m_isGameRunning = initialize_window();
-	m_ball.set_entity(20 , 20 , 150 , 200 , 15 , 15);
+	m_ball.set_entity(20 , 20 , 300 , 300 , 15 , 15);
 	m_paddle.set_entity(0 , (m_windowHeight - 40.0f) , 0 , 0 , 150 , 20);
 	m_paddle.x = (m_windowWidth / 2.0f) - (m_paddle.width / 2.0f);
 }
@@ -84,29 +98,41 @@ void Application::update_data()
 
 	if (m_isGamePaused == false)
 	{
+		// Move the paddle
+		m_paddle.lastX = m_paddle.x;
+		m_paddle.x += m_paddle.velX * deltaTime;
+		if (m_paddle.x < 0 || (m_paddle.x + m_paddle.width > m_windowWidth))
+			m_paddle.x = m_paddle.lastX;
+		
 		// Move the ball
-		float ballLastX = m_ball.x;
-		float ballLastY = m_ball.y;
+		m_ball.lastX = m_ball.x;
+		m_ball.lastY = m_ball.y;
 
 		m_ball.x += m_ball.velX * deltaTime;
-		if (m_ball.x < 0 || m_ball.x >(m_windowWidth - m_ball.width))
+		m_ball.y += m_ball.velY * deltaTime;
+
+		// Ball collision with the walls
+		if (m_ball.x < 0 || (m_ball.x + m_ball.width > m_windowWidth))
 		{
-			m_ball.x = ballLastX;
+			m_ball.x = m_ball.lastX;
 			m_ball.velX *= -1;
 		}
-
-		m_ball.y += m_ball.velY * deltaTime;
-		if (m_ball.y < 0 || m_ball.y >(m_windowHeight - m_ball.height))
+		if (m_ball.y < 0)
 		{
-			m_ball.y = ballLastY;
+			m_ball.y = m_ball.lastY;
 			m_ball.velY *= -1;
 		}
 
-		// Move the paddle
-		float paddleLastX = m_paddle.x;
-		m_paddle.x += m_paddle.velX * deltaTime;
-		if (m_paddle.x < 0 || m_paddle.x >(m_windowWidth - m_paddle.width))
-			m_paddle.x = paddleLastX;
+		// Ball collision with the paddle
+		if (collision(m_paddle , m_ball))
+		{
+			m_ball.x = m_ball.lastX;
+			m_ball.y = m_ball.lastY;
+		}
+
+		// Check for game over if the ball hits the bottom part of the screen
+		if (m_ball.y + m_ball.height > m_windowHeight)
+			m_isGameRunning = false;
 	}
 }
 

@@ -4,7 +4,7 @@ class Entity
 {
 public:
 	Entity()
-		: x {} , y {} , velX {} , velY {} , width {} , height {} { }
+		: x {} , y {} , velX {} , velY {} , width {} , height {} , lastX {0} , lastY {0} { }
 	
 	inline void set_entity(float xVal , float yVal , float velXVal , float velYVal , float widthVal , float heightVal)
 	{
@@ -23,4 +23,6 @@ public:
 	float velY;
 	float width;
 	float height;
+	float lastX;
+	float lastY;
 };

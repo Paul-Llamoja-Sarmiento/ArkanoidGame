@@ -1,5 +1,4 @@
 #include "Application.h"
-#include "Constants.h"
 
 
 int main(int argc , char *args[])

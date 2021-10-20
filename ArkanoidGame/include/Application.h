@@ -22,6 +22,7 @@ public:
 
 	inline bool get_is_game_running() { return m_isGameRunning; }
 	bool initialize_window();
+	bool collision(Entity &paddle , Entity &ball);
 
 	// Game-loop methods
 	void set_up();
