@@ -31,14 +31,36 @@ bool Application::initialize_window()
 
 bool Application::collision(Entity &paddle , Entity &ball)
 {
-	// Top surface collision
-	if ((ball.y + ball.height > paddle.y) && (ball.x > paddle.x) && (ball.x + ball.width < paddle.x + paddle.width))
+	if ((ball.x < paddle.x + paddle.width) && (ball.x + ball.width > paddle.x) &&
+		(ball.y < paddle.y + paddle.height) && (ball.y + ball.height > paddle.y))
 	{
-		ball.velY *= -1;
+		if (ball.y <= paddle.y)
+		{
+			// Top edges collision
+			if (ball.x < paddle.x)
+			{
+				ball.velX = -1 * std::fabs(ball.velX);
+				ball.velY *= -1;
+			}
+			else if (ball.x + ball.width > paddle.x + paddle.width)
+			{
+				ball.velX = std::fabs(ball.velX);
+				ball.velY *= -1;
+			}
+			// Top surface collision
+			else
+				ball.velY *= -1;
+		}
+		else
+		{
+			// Side collision
+			ball.velX *= -1;
+		}
+		// TODO: Resolve collision in the bottom side, in order to use this same function to test collision with bricks
 		return true;
 	}
 	else
-		return false;		
+		return false;
 }
 
 
@@ -46,7 +68,7 @@ void Application::set_up()
 {
 	m_isGamePaused = false;
 	m_isGameRunning = initialize_window();
-	m_ball.set_entity(20 , 20 , 300 , 300 , 15 , 15);
+	m_ball.set_entity(20 , 20 , 150 , 150 , 15 , 15);
 	m_paddle.set_entity(0 , (m_windowHeight - 40.0f) , 0 , 0 , 150 , 20);
 	m_paddle.x = (m_windowWidth / 2.0f) - (m_paddle.width / 2.0f);
 }
@@ -126,8 +148,9 @@ void Application::update_data()
 		// Ball collision with the paddle
 		if (collision(m_paddle , m_ball))
 		{
-			m_ball.x = m_ball.lastX;
-			m_ball.y = m_ball.lastY;
+			m_ball.x = m_ball.lastX + m_paddle.velX * deltaTime;
+			m_ball.y = m_ball.lastY + m_paddle.velY * deltaTime;
+			// It is needed to test another collision if there are bodies that are very close
 		}
 
 		// Check for game over if the ball hits the bottom part of the screen
