@@ -29,6 +29,18 @@ bool Application::initialize_window()
 }
 
 
+void Application::initialize_bricks()
+{
+	float x {136}, y {50} , width {150}, height {20};
+	int xDistance {136};
+	for (auto &brick : m_bricks)
+	{
+		brick.set_entity(x , y , 0 , 0 , width , height);
+		x += width + xDistance;
+	}
+}
+
+
 bool Application::collision(Entity &paddle , Entity &ball)
 {
 	if ((ball.x < paddle.x + paddle.width) && (ball.x + ball.width > paddle.x) &&
@@ -73,7 +85,7 @@ bool Application::collision(Entity &paddle , Entity &ball)
 			// Side collision
 			ball.velX *= -1;
 		}
-		// TODO: Resolve collision in the bottom side, in order to use this same function to test collision with bricks
+
 		return true;
 	}
 	else
@@ -81,11 +93,43 @@ bool Application::collision(Entity &paddle , Entity &ball)
 }
 
 
+bool Application::collision(std::vector<Entity> &bricks , Entity &ball)
+{
+	bool collisionFlag {false};
+
+	for (auto &brick : bricks)
+	{
+		if (collision(brick , ball))
+		{
+			collisionFlag = true;
+			brick.set_entity(-100 , 0 , 0 , 0 , 0 , 0);
+			break;
+		}
+	}
+
+	return collisionFlag;
+}
+
+
+void Application::render_bricks()
+{
+	for (auto &brick : m_bricks)
+	{
+		SDL_Rect brickRectangle = {static_cast<int>(brick.x) ,
+								   static_cast<int>(brick.y) ,
+								   static_cast<int>(brick.width) ,
+								   static_cast<int>(brick.height)};
+		SDL_RenderFillRect(m_pRenderer , &brickRectangle);
+	}
+	
+}
+
+
 void Application::set_up()
 {
-	m_isGamePaused = false;
+	initialize_bricks();
 	m_isGameRunning = initialize_window();
-	m_ball.set_entity(m_windowWidth / 2.0f , m_windowHeight / 4.0f , 200 , 200 , 10 , 10);
+	m_ball.set_entity(20 , 200 , 150 , 150 , 15 , 15);
 	m_paddle.set_entity(0 , (m_windowHeight - 40.0f) , 0 , 0 , 150 , 20);
 	m_paddle.x = (m_windowWidth / 2.0f) - (m_paddle.width / 2.0f);
 }
@@ -156,7 +200,7 @@ void Application::update_data()
 			m_ball.x = m_ball.lastX;
 			m_ball.velX *= -1;
 		}
-		if (m_ball.y < 0 || m_ball.y + m_ball.height > m_windowHeight)
+		if (m_ball.y < 0)
 		{
 			m_ball.y = m_ball.lastY;
 			m_ball.velY *= -1;
@@ -170,9 +214,16 @@ void Application::update_data()
 			// It is needed to test another collision if there are bodies that are very close
 		}
 
+		if (collision(m_bricks , m_ball))
+		{
+			m_ball.x = m_ball.lastX + m_paddle.velX * deltaTime;
+			m_ball.y = m_ball.lastY + m_paddle.velY * deltaTime;
+			// It is needed to test another collision if there are bodies that are very close
+		}
+
 		// Check for game over if the ball hits the bottom part of the screen
-		//if (m_ball.y + m_ball.height > m_windowHeight)
-			//m_isGameRunning = false;
+		if (m_ball.y + m_ball.height > m_windowHeight)
+			m_isGameRunning = false;
 	}
 }
 
@@ -183,6 +234,9 @@ void Application::render()
 	SDL_RenderClear(m_pRenderer);
 
 	SDL_SetRenderDrawColor(m_pRenderer , 255 , 255 , 255 , 255);
+
+	// Draw the bricks
+	// TODO: Draw the bricks using m_bricks and a for loop
 
 	// Draw a "ball"
 	SDL_Rect ballRectangle = {static_cast<int>(m_ball.x) ,
@@ -197,6 +251,10 @@ void Application::render()
 								static_cast<int>(m_paddle.width) ,
 								static_cast<int>(m_paddle.height)};
 	SDL_RenderFillRect(m_pRenderer , &paddleRectangle);
+
+	// Draw the bricks
+
+	render_bricks();
 
 	// Buffer swap
 	SDL_RenderPresent(m_pRenderer);	

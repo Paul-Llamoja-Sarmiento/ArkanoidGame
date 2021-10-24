@@ -2,6 +2,8 @@
 
 #include <SDL.h>
 #include <iostream>
+#include <cmath>
+#include <vector>
 #include "Constants.h"
 #include "Entity.h"
 
@@ -12,7 +14,8 @@ public:
 	Application()
 		: m_pWindow {nullptr} , m_pRenderer {nullptr} , m_isGameRunning {false} ,
 		  m_windowHeight {WINDOW_HEIGHT} , m_windowWidth {WINDOW_WIDTH} ,
-		  m_frameTargetTime {FRAME_TARGET_TIME} , m_lastFrameTime {0} , m_isGamePaused {false} { }
+		  m_frameTargetTime {FRAME_TARGET_TIME} , m_lastFrameTime {0} ,
+		  m_isGamePaused {false} , m_bricks {4} { }
 	~Application()
 	{
 		SDL_DestroyRenderer(m_pRenderer);
@@ -22,7 +25,10 @@ public:
 
 	inline bool get_is_game_running() { return m_isGameRunning; }
 	bool initialize_window();
+	void initialize_bricks();
 	bool collision(Entity &paddle , Entity &ball);
+	bool collision(std::vector<Entity> &bricks , Entity &ball);
+	void render_bricks();
 
 	// Game-loop methods
 	void set_up();
@@ -48,4 +54,5 @@ private:
 	// Entities
 	Entity m_ball;
 	Entity m_paddle;
+	std::vector<Entity> m_bricks;
 };
