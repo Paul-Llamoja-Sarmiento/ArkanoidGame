@@ -31,12 +31,20 @@ bool Application::initialize_window()
 
 void Application::initialize_bricks()
 {
-	float x {136}, y {50} , width {150}, height {20};
-	int xDistance {136};
+	float x{38} , y{20} , width{100} , height{20};
+	float xDistance{38};
+	int numberColumns {9};
+	float topX = x + (numberColumns - 1) * (width + xDistance);
+
 	for (auto &brick : m_bricks)
 	{
 		brick.set_entity(x , y , 0 , 0 , width , height);
 		x += width + xDistance;
+		if (x > topX)
+		{
+			x = 38;
+			y += 40;
+		}
 	}
 }
 
@@ -95,19 +103,18 @@ bool Application::collision(Entity &paddle , Entity &ball)
 
 bool Application::collision(std::vector<Entity> &bricks , Entity &ball)
 {
-	bool collisionFlag {false};
-
 	for (auto &brick : bricks)
 	{
 		if (collision(brick , ball))
 		{
-			collisionFlag = true;
 			brick.set_entity(-100 , 0 , 0 , 0 , 0 , 0);
-			break;
+			if (++m_bricks_taken == bricks.size())
+				m_isGameRunning = false;		// Win condition
+			return true;
 		}
 	}
 
-	return collisionFlag;
+	return false;
 }
 
 
@@ -129,9 +136,9 @@ void Application::set_up()
 {
 	initialize_bricks();
 	m_isGameRunning = initialize_window();
-	m_ball.set_entity(20 , 200 , 150 , 150 , 15 , 15);
 	m_paddle.set_entity(0 , (m_windowHeight - 40.0f) , 0 , 0 , 150 , 20);
 	m_paddle.x = (m_windowWidth / 2.0f) - (m_paddle.width / 2.0f);
+	m_ball.set_entity(m_paddle.x , m_paddle.y - 20 , -125 , -130 , 20 , 20);
 }
 
 

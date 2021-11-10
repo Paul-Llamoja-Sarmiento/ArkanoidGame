@@ -15,7 +15,7 @@ public:
 		: m_pWindow {nullptr} , m_pRenderer {nullptr} , m_isGameRunning {false} ,
 		  m_windowHeight {WINDOW_HEIGHT} , m_windowWidth {WINDOW_WIDTH} ,
 		  m_frameTargetTime {FRAME_TARGET_TIME} , m_lastFrameTime {0} ,
-		  m_isGamePaused {false} , m_bricks {4} { }
+		  m_isGamePaused {false} , m_bricks {45} , m_bricks_taken {0} { }
 	~Application()
 	{
 		SDL_DestroyRenderer(m_pRenderer);
@@ -46,6 +46,7 @@ private:
 	bool m_isGamePaused;
 	SDL_Window *m_pWindow;
 	SDL_Renderer *m_pRenderer;
+	int m_bricks_taken;
 
 	// Update time parameters
 	int m_frameTargetTime;	// Time in miliseconds between frames that we want to achieve
